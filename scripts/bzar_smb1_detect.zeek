@@ -1,8 +1,12 @@
 #
 # File: bzar_smb1_detect.zeek
 # Created: 20180701
-# Updated: 20201009
-#
+# Updated: 20201109
+
+# Updated by Patrick Kelley for enhanced Leargas Functionality
+# Primary enhancements made to the notice message output.
+# Patrick Kelley (patrick.kelley@criticalpathsecurity.com)
+
 # Copyright 2018 The MITRE Corporation.  All Rights Reserved.
 # Approved for public release.  Distribution unlimited.  Case number 18-3868.
 #
@@ -40,13 +44,13 @@ event smb1_nt_create_andx_request(c: connection, hdr: SMB1::Header, name: string
 	# so the smb_files.log is consistent with smb_cmd.log.
 	# Let's do this now, during smb1_nt_create_andx_request.
 
-	if ( c$smb_state$current_tree?$path && !c$smb_state$current_file?$path ) 
-		c$smb_state$current_file$path = c$smb_state$current_tree$path; 
+	if ( c$smb_state$current_tree?$path && !c$smb_state$current_file?$path )
+		c$smb_state$current_file$path = c$smb_state$current_tree$path;
 }
 
 
 event smb1_write_andx_request(c: connection, hdr: SMB1::Header, file_id: count, offset: count, data_len: count) &priority=3
-{ 
+{
 	# Keep track of the number of bytes in the Write Request.
 	# priority==3 ... We want to execute before writing to smb_files.log
 
@@ -67,10 +71,10 @@ event smb1_write_andx_response(c: connection, hdr: SMB1::Header, written_bytes: 
 	if ( !c?$smb_state || !c$smb_state?$current_file )
 		return;
 
-	if ( c$smb_state$current_tree?$path && !c$smb_state$current_file?$path ) 
-		c$smb_state$current_file$path = c$smb_state$current_tree$path; 
+	if ( c$smb_state$current_tree?$path && !c$smb_state$current_file?$path )
+		c$smb_state$current_file$path = c$smb_state$current_tree$path;
 
-	# Keep track of the number of bytes in the Write Response. 
+	# Keep track of the number of bytes in the Write Response.
 	# priority==3 ... We want to execute before writing to smb_files.log
 
 	c$smb_state$current_file$data_len_rsp = written_bytes;

@@ -1,8 +1,12 @@
 #
 # File: bzar_smb2_detect.zeek
 # Created: 20180701
-# Updated: 20201009
-#
+# Updated: 20201109
+
+# Updated by Patrick Kelley for enhanced Leargas Functionality
+# Primary enhancements made to the notice message output.
+# Patrick Kelley (patrick.kelley@criticalpathsecurity.com)
+
 # Copyright 2018 The MITRE Corporation.  All Rights Reserved.
 # Approved for public release.  Distribution unlimited.  Case number 18-3868.
 #
@@ -21,7 +25,7 @@ event smb2_message(c: connection, hdr: SMB2::Header, is_orig: bool) &priority=3
 	# for SMB1 (populated) and SMB2 (was not populated).
 
 	if ( c$smb_state$current_tree?$path )
-	     c$smb_state$current_cmd$tree = c$smb_state$current_tree$path; 
+	     c$smb_state$current_cmd$tree = c$smb_state$current_tree$path;
 }
 
 
@@ -34,9 +38,9 @@ event smb2_tree_connect_request(c: connection, hdr: SMB2::Header, path: string) 
 	# The smb_cmd.log was inconsistent with certain fields
 	# for SMB1 (populated) and SMB2 (was not populated).
 
-	local tmp_tree = SMB::TreeInfo($ts=network_time(), $uid=c$uid, $id=c$id, $path=path); 
+	local tmp_tree = SMB::TreeInfo($ts=network_time(), $uid=c$uid, $id=c$id, $path=path);
 
-	c$smb_state$current_cmd$referenced_tree = tmp_tree; 
+	c$smb_state$current_cmd$referenced_tree = tmp_tree;
 	c$smb_state$current_cmd$argument = path;
 
 
@@ -74,27 +78,27 @@ event smb2_create_request(c: connection, hdr: SMB2::Header, request: SMB2::Creat
 	# so the smb_files.log is consistent with smb_cmd.log.
 	# Let's do this now, during smb2_create_request.
 
-	if ( c$smb_state$current_tree?$path && !c$smb_state$current_file?$path ) 
-	     c$smb_state$current_file$path = c$smb_state$current_tree$path; 
+	if ( c$smb_state$current_tree?$path && !c$smb_state$current_file?$path )
+	     c$smb_state$current_file$path = c$smb_state$current_tree$path;
 }
 
 
-event smb2_write_request(c: connection, hdr: SMB2::Header, file_id: SMB2::GUID, offset: count, data_len: count) &priority=3 
-{ 
-	# Keep track of the number of bytes in the Write Response. 
+event smb2_write_request(c: connection, hdr: SMB2::Header, file_id: SMB2::GUID, offset: count, data_len: count) &priority=3
+{
+	# Keep track of the number of bytes in the Write Response.
 	# priority==3 ... We want to execute before writing to smb_files.log
 
 	c$smb_state$current_file$data_offset_req = offset;
 	c$smb_state$current_file$data_len_req    = data_len;
-} 
+}
 
 
-event smb2_write_request(c: connection, hdr: SMB2::Header, file_id: SMB2::GUID, offset: count, data_len: count) &priority=2 
+event smb2_write_request(c: connection, hdr: SMB2::Header, file_id: SMB2::GUID, offset: count, data_len: count) &priority=2
 {
-	# NOTE: Preference would be to detect 'smb2_write_response' 
-	#       event (instead of 'smb2_write_request'), because it 
-	#       would confirm the file was actually written to the 
-	#       remote destination.  Unfortuantely, Bro/Zeek does 
+	# NOTE: Preference would be to detect 'smb2_write_response'
+	#       event (instead of 'smb2_write_request'), because it
+	#       would confirm the file was actually written to the
+	#       remote destination.  Unfortuantely, Bro/Zeek does
 	#       not have an event for that SMB message-type yet.
 
 	local smb_action = "SMB::FILE_WRITE to";
@@ -120,14 +124,14 @@ event smb2_write_request(c: connection, hdr: SMB2::Header, file_id: SMB2::GUID, 
 # #
 #event smb2_write_response(c: connection, hdr: SMB2::Header, file_id: SMB2::GUID, written_bytes: count) &priority=3
 #{
-#	# Keep track of the number of bytes in the Write Response. 
+#	# Keep track of the number of bytes in the Write Response.
 #	# priority==3 ... We want to execute before writing to smb_files.log
 #	c$smb_state$current_file$data_len_rsp = written_bytes;
 #}
 
 #event smb2_write_response(c: connection, hdr: SMB2::Header, file_id: SMB2::GUID, written_bytes: count) &priority=-5
 #{
-#	SMB::write_file_log(c$smb_state); 
+#	SMB::write_file_log(c$smb_state);
 #}
 
 #end bzar_smb2_detect.zeek

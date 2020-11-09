@@ -1,7 +1,12 @@
 #
 # File: bzar_smb_report.zeek
 # Created: 20180701
-# Updated: 20201009
+# Updated: 20201109
+
+# Updated by Patrick Kelley for enhanced Leargas Functionality
+# Primary enhancements made to the notice message output.
+# Patrick Kelley (patrick.kelley@criticalpathsecurity.com)
+
 #
 # Copyright 2018 The MITRE Corporation.  All Rights Reserved.
 # Approved for public release.  Distribution unlimited.  Case number 18-3868.
@@ -50,7 +55,7 @@ function smb_tree_name ( s : SMB::State ) : string
 	}
 	else {
 		tree_name = "";
-	}	
+	}
 
 	return tree_name;
 }
@@ -78,7 +83,7 @@ function smb_admin_file_share_test ( s : SMB::State ) : bool
 	}
 	else {
 		tree_name = "";
-	}	
+	}
 
 	local a = 0;
 	local b = |BZAR::smb_admin_file_shares|;
@@ -117,7 +122,7 @@ function smb_t1021_002_log ( c : connection, action : string ) : bool
 	# Raise Notice
 	#
 
-	if ( t1021_002_report_option ) 
+	if ( t1021_002_report_option )
 	{
 		# Get whitelist from config options
 		local w1 : BZAR::EndpointWhitelist;
@@ -140,6 +145,7 @@ function smb_t1021_002_log ( c : connection, action : string ) : bool
 			NOTICE([$note=ATTACK::Lateral_Movement,
 				$msg=fmt(notice_msg, action, tree_name),
 				$sub=BZAR::attack_info["t1021.002"],
+				$identifier=cat(c$id$orig_h),
 				$conn=c]
 			);
 		}
@@ -234,6 +240,7 @@ function smb_t1021_002_t1570_log ( c : connection, action : string ) : bool
 			NOTICE([$note=ATTACK::Lateral_Movement,
 				$msg=fmt(notice_msg, action, file_name),
 				$sub=fmt("%s + %s", t1, t2),
+				$identifier=cat(c$id$orig_h),
 				$conn=c]
 			);
 		}

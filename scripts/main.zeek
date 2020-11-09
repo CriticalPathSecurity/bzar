@@ -1,7 +1,12 @@
 #
 # File: main.zeek
 # Created: 20180701
-# Updated: 20201009
+# Updated: 20201109
+
+# Updated by Patrick Kelley for enhanced Leargas Functionality
+# Primary enhancements made to the notice message output.
+# Patrick Kelley (patrick.kelley@criticalpathsecurity.com)
+
 #
 # Copyright 2018 The MITRE Corporation.  All Rights Reserved.
 # Approved for public release.  Distribution unlimited.  Case number 18-3868.
@@ -47,9 +52,9 @@ export
 	# Full descriptive name of each ATT&CK Technique
 	# Used in BZAR Reporting
 
-	const attack_info : table[string] of string = 
+	const attack_info : table[string] of string =
 	{
-		["t1003.006"] = "T1003.006 OS Credential Dumping: DCSync", 
+		["t1003.006"] = "T1003.006 OS Credential Dumping: DCSync",
 		["t1547.004"] = "T1547.004 Boot or Logon Autostart Execution: Winlogon Helper DLL",
 		["t1547.010"] = "T1547.010 Boot or Logon Autostart Execution: Port Monitors",
 		["t1016"] = "T1016 System Network Configuration Discovery",
@@ -175,9 +180,9 @@ event bro_init()
 	# 1- SumStats Analytics for ATT&CK Lateral Movement and Execution
 	#
 	# Description:
-	#    Use SumStats to raise a Bro/Zeek Notice event if an SMB Lateral Movement 
-	#    indicator (e.g., SMB File Write to a Windows Admin File Share: ADMIN$ or 
-	#    C$ only) is observed together with a DCE-RPC Execution indicator against 
+	#    Use SumStats to raise a Bro/Zeek Notice event if an SMB Lateral Movement
+	#    indicator (e.g., SMB File Write to a Windows Admin File Share: ADMIN$ or
+	#    C$ only) is observed together with a DCE-RPC Execution indicator against
 	#    the same (targeted) host, within a specified period of time.
 	#
 	# Relevant ATT&CK Technique(s):
@@ -189,17 +194,17 @@ event bro_init()
 	# Relevant Indicator(s) Detected by Bro/Zeek:
 	#    (a) smb1_write_andx_response::c$smb_state$path contains ADMIN$ or C$
 	#    (b) smb2_write_request::c$smb_state$path contains ADMIN$ or C$**
-	#    (c) dce_rpc_response::c$dce_rpc$endpoint + c$dce_rpc$operation contains 
+	#    (c) dce_rpc_response::c$dce_rpc$endpoint + c$dce_rpc$operation contains
 	#        any of the following:
 	#          BZAR::t1569_002_rpc_strings
 	#          BZAR::t1047_rpc_strings
 	#          BZAR::t1053_002_rpc_strings
 	#          BZAR::t1053_005_rpc_strings
-	# 
-	# **NOTE: Preference would be to detect 'smb2_write_response' 
-	#       event (instead of 'smb2_write_request'), because it 
-	#       would confirm the file was actually written to the 
-	#       remote destination.  Unfortuantely, Bro/Zeek does 
+	#
+	# **NOTE: Preference would be to detect 'smb2_write_response'
+	#       event (instead of 'smb2_write_request'), because it
+	#       would confirm the file was actually written to the
+	#       remote destination.  Unfortuantely, Bro/Zeek does
 	#       not have an event for that SMB message-type yet.
 	#
 	# Globals (defined in bzar_config_options.zeek):
@@ -220,7 +225,7 @@ event bro_init()
 		{
 			return result["attack_lm_ex"]$sum;
 		},
-		$threshold_crossed(key:SumStats::Key, result:SumStats::Result) = 
+		$threshold_crossed(key:SumStats::Key, result:SumStats::Result) =
 		{
 			local r = result["attack_lm_ex"];
 
@@ -228,13 +233,16 @@ event bro_init()
 			# at least one SMB_WRITE was observed
 
 			if ( r$max == 1000 && r$min == 1 )
-			{ 
+			{
 				local s = fmt("Detected activity against host %s, total score %.0f within timeframe %s", key$host, r$sum, bzar1_epoch);
 
 				# Raise Notice
-				NOTICE([$note=ATTACK::Lateral_Movement_and_Execution,
-					$msg=s]
-				);
+					NOTICE([$note=ATTACK::Lateral_Movement_and_Execution,
+					$src=key$host,
+					$msg=s,
+					$sub=cat(r$sum),
+					$identifier=cat(key$host)
+					]);
 			}
 		}
 	]);
@@ -243,9 +251,9 @@ event bro_init()
 	# 2- SumStats Analytics for ATTACK Lateral Movement (Multiple Attempts)
 	#
 	# Description:
-	#    Use SumStats to raise a Bro/Zeek Notice event if multiple SMB Lateral 
+	#    Use SumStats to raise a Bro/Zeek Notice event if multiple SMB Lateral
 	#    Movement indicators (e.g., multiple attempts to connect to a Windows Admin
-	#    File Share: ADMIN$ or C$ only) are observed originating from the same host, 
+	#    File Share: ADMIN$ or C$ only) are observed originating from the same host,
 	#    regardless of write-attempts and regardless of whether or not any connection
 	#    is successful --just connection attempts-- within a specified period of time.
 	#
@@ -274,14 +282,16 @@ event bro_init()
 		{
 			return result["attack_lm_multiple_t1021_002"]$sum;
 		},
-		$threshold_crossed(key:SumStats::Key, result:SumStats::Result) = 
+		$threshold_crossed(key:SumStats::Key, result:SumStats::Result) =
 		{
 			local s = fmt("Detected T1021.002 Admin File Share activity from host %s, total attempts %.0f within timeframe %s", key$host, result["attack_lm_multiple_t1021_002"]$sum, bzar2_epoch);
 
 			# Raise Notice
 			NOTICE([$note=ATTACK::Lateral_Movement_Multiple_Attempts,
-				$msg=s]
-			);
+			$src=key$host,
+			$msg=s,
+			$identifier=cat(key$host)
+			]);
 		}
 	]);
 
@@ -289,15 +299,15 @@ event bro_init()
 	# 3- SumStats Analytics for ATTACK Discovery
 	#
 	# Description:
-	#    Use SumStats to raise a Bro/Zeek Notice event if multiple instances of 
-	#    DCE-RPC Discovery indicators are observed originating from the same host, 
+	#    Use SumStats to raise a Bro/Zeek Notice event if multiple instances of
+	#    DCE-RPC Discovery indicators are observed originating from the same host,
 	#    within a specified period of time.
 	#
 	# Relevant ATT&CK Technique(s):
 	#    T1016 System Network Configuration Discovery
-	#    T1018 Remote System Discovery 
-	#    T1033 System Owner/User Discovery 
-	#    T1069 Permission Groups Discovery 
+	#    T1018 Remote System Discovery
+	#    T1033 System Owner/User Discovery
+	#    T1069 Permission Groups Discovery
 	#    T1082 System Information Discovery
 	#    T1083 File & Directory Discovery
 	#    T1087 Account Discovery
@@ -305,7 +315,7 @@ event bro_init()
 	#    T1135 Network Share Discovery
 	#
 	# Relevant Indicator(s) Detected by Bro/Zeek:
-	#    (a) dce_rpc_response::c$dce_rpc$endpoint + c$dce_rpc$operation contains 
+	#    (a) dce_rpc_response::c$dce_rpc$endpoint + c$dce_rpc$operation contains
 	#        any of the following:
 	#          BZAR::t1016_rpc_strings
 	#          BZAR::t1018_rpc_strings
@@ -316,7 +326,7 @@ event bro_init()
 	#          BZAR::t1087_rpc_strings
 	#          BZAR::t1124_rpc_strings
 	#          BZAR::t1135_rpc_strings
-	# 
+	#
 	# Globals (defined in bzar_config_options.zeek):
 	#    bzar3_epoch
 	#    bzar3_limit
@@ -335,14 +345,16 @@ event bro_init()
 		{
 			return result["attack_discovery"]$sum;
 		},
-		$threshold_crossed(key:SumStats::Key, result:SumStats::Result) = 
+		$threshold_crossed(key:SumStats::Key, result:SumStats::Result) =
 		{
 			local s = fmt("Detected activity from host %s, total attempts %.0f within timeframe %s", key$host, result["attack_discovery"]$sum, bzar3_epoch);
 
 			# Raise Notice
 			NOTICE([$note=ATTACK::Discovery,
-				$msg=s]
-			);
+			$src=key$host,
+			$msg=s,
+			$identifier=cat(key$host)
+			]);
 		}
 	]);
 }

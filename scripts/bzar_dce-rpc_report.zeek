@@ -1,7 +1,12 @@
 #
 # File: bzar_dce-rpc_report.zeek
 # Created: 20180701
-# Updated: 20201009
+# Updated: 20201109
+
+# Updated by Patrick Kelley for enhanced Leargas Functionality
+# Primary enhancements made to the notice message output.
+# Patrick Kelley (patrick.kelley@criticalpathsecurity.com)
+
 #
 # Copyright 2018 The MITRE Corporation.  All Rights Reserved.
 # Approved for public release.  Distribution unlimited.  Case number 18-3868.
@@ -41,6 +46,7 @@ function rpc_t1003_006_log ( c : connection, rpc : string ) : bool
 			NOTICE([$note=ATTACK::Credential_Access,
 				$msg=rpc,
 				$sub=BZAR::attack_info["t1003.006"],
+				$identifier=cat(c$id$orig_h),
 				$conn=c]
 			);
 		}
@@ -78,6 +84,7 @@ function rpc_t1070_001_log ( c : connection, rpc : string ) : bool
 			NOTICE([$note=ATTACK::Defense_Evasion,
 				$msg=rpc,
 				$sub=BZAR::attack_info["t1070.001"],
+				$identifier=cat(c$id$orig_h),
 				$conn=c]
 			);
 		}
@@ -115,6 +122,7 @@ function rpc_t1569_002_log ( c : connection, rpc : string ) : bool
 			NOTICE([$note=ATTACK::Execution,
 				$msg=rpc,
 				$sub=BZAR::attack_info["t1569.002"],
+				$identifier=cat(c$id$orig_h),
 				$conn=c]
 			);
 		}
@@ -182,6 +190,7 @@ function rpc_t1047_log ( c : connection, rpc : string ) : bool
 			NOTICE([$note=ATTACK::Execution,
 				$msg=rpc,
 				$sub=BZAR::attack_info["t1047"],
+				$identifier=cat(c$id$orig_h),
 				$conn=c]
 			);
 		}
@@ -249,6 +258,7 @@ function rpc_t1053_002_log ( c : connection, rpc : string ) : bool
 			NOTICE([$note=ATTACK::Execution,
 				$msg=rpc,
 				$sub=BZAR::attack_info["t1053.002"],
+				$identifier=cat(c$id$orig_h),
 				$conn=c]
 			);
 		}
@@ -316,6 +326,7 @@ function rpc_t1053_005_log ( c : connection, rpc : string ) : bool
 			NOTICE([$note=ATTACK::Execution,
 				$msg=rpc,
 				$sub=BZAR::attack_info["t1053.005"],
+				$identifier=cat(c$id$orig_h),
 				$conn=c]
 			);
 		}
@@ -383,6 +394,7 @@ function rpc_t1529_log ( c : connection, rpc : string ) : bool
 			NOTICE([$note=ATTACK::Defense_Evasion,
 				$msg=rpc,
 				$sub=BZAR::attack_info["t1529"],
+				$identifier=cat(c$id$orig_h),
 				$conn=c]
 			);
 		}
@@ -420,6 +432,7 @@ function rpc_t1547_004_log ( c : connection, rpc : string ) : bool
 			NOTICE([$note=ATTACK::Persistence,
 				$msg=rpc,
 				$sub=BZAR::attack_info["t1547.004"],
+				$identifier=cat(c$id$orig_h),
 				$conn=c]
 			);
 		}
@@ -457,6 +470,7 @@ function rpc_t1547_010_log ( c : connection, rpc : string ) : bool
 			NOTICE([$note=ATTACK::Persistence,
 				$msg=rpc,
 				$sub=BZAR::attack_info["t1547.010"],
+				$identifier=cat(c$id$orig_h),
 				$conn=c]
 			);
 		}
@@ -494,6 +508,7 @@ function rpc_t1016_log ( c : connection, rpc : string ) : bool
 			NOTICE([$note=ATTACK::Discovery,
 				$msg=rpc,
 				$sub=BZAR::attack_info["t1016"],
+				$identifier=cat(c$id$orig_h),
 				$conn=c]
 			);
 		}
@@ -533,7 +548,7 @@ function rpc_t1016_log ( c : connection, rpc : string ) : bool
 
 function rpc_t1018_log ( c : connection, rpc : string ) : bool
 {
-	# 
+	#
 
 	#
 	# Raise Notice
@@ -559,6 +574,7 @@ function rpc_t1018_log ( c : connection, rpc : string ) : bool
 			NOTICE([$note=ATTACK::Discovery,
 				$msg=rpc,
 				$sub=BZAR::attack_info["t1018"],
+				$identifier=cat(c$id$orig_h),
 				$conn=c]
 			);
 		}
@@ -624,6 +640,7 @@ function rpc_t1033_log ( c : connection, rpc : string ) : bool
 			NOTICE([$note=ATTACK::Discovery,
 				$msg=rpc,
 				$sub=BZAR::attack_info["t1033"],
+				$identifier=cat(c$id$orig_h),
 				$conn=c]
 			);
 		}
@@ -689,6 +706,7 @@ function rpc_t1049_log ( c : connection, rpc : string ) : bool
 			NOTICE([$note=ATTACK::Discovery,
 				$msg=rpc,
 				$sub=BZAR::attack_info["t1049"],
+				$identifier=cat(c$id$orig_h),
 				$conn=c]
 			);
 		}
@@ -754,6 +772,7 @@ function rpc_t1069_log ( c : connection, rpc : string ) : bool
 			NOTICE([$note=ATTACK::Discovery,
 				$msg=rpc,
 				$sub=BZAR::attack_info["t1069"],
+				$identifier=cat(c$id$orig_h),
 				$conn=c]
 			);
 		}
@@ -819,6 +838,7 @@ function rpc_t1082_log ( c : connection, rpc : string ) : bool
 			NOTICE([$note=ATTACK::Discovery,
 				$msg=rpc,
 				$sub=BZAR::attack_info["t1082"],
+				$identifier=cat(c$id$orig_h),
 				$conn=c]
 			);
 		}
@@ -884,6 +904,7 @@ function rpc_t1083_log ( c : connection, rpc : string ) : bool
 			NOTICE([$note=ATTACK::Discovery,
 				$msg=rpc,
 				$sub=BZAR::attack_info["t1083"],
+				$identifier=cat(c$id$orig_h),
 				$conn=c]
 			);
 		}
@@ -949,6 +970,7 @@ function rpc_t1087_log ( c : connection, rpc : string ) : bool
 			NOTICE([$note=ATTACK::Discovery,
 				$msg=rpc,
 				$sub=BZAR::attack_info["t1087"],
+				$identifier=cat(c$id$orig_h),
 				$conn=c]
 			);
 		}
@@ -1014,6 +1036,7 @@ function rpc_t1124_log ( c : connection, rpc : string ) : bool
 			NOTICE([$note=ATTACK::Discovery,
 				$msg=rpc,
 				$sub=BZAR::attack_info["t1124"],
+				$identifier=cat(c$id$orig_h),
 				$conn=c]
 			);
 		}
@@ -1079,6 +1102,7 @@ function rpc_t1135_log ( c : connection, rpc : string ) : bool
 			NOTICE([$note=ATTACK::Discovery,
 				$msg=rpc,
 				$sub=BZAR::attack_info["t1135"],
+				$identifier=cat(c$id$orig_h),
 				$conn=c]
 			);
 		}

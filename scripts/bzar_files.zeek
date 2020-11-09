@@ -1,7 +1,12 @@
 #
-# File: bzar_files.bro
+# File: bzar_files.zeek
 # Created: 20180701
-# Updated: 20200228
+# Updated: 20201109
+
+# Updated by Patrick Kelley for enhanced Leargas Functionality
+# Primary enhancements made to the notice message output.
+# Patrick Kelley (patrick.kelley@criticalpathsecurity.com)
+
 #
 # Copyright 2018 The MITRE Corporation.  All Rights Reserved.
 # Approved for public release.  Distribution unlimited.  Case number 18-3868.
@@ -86,6 +91,7 @@ event file_state_remove(f:fa_file)
 						$msg="Saved a copy of the file written to SMB admin file share",
 						$sub=fname,
 						$f=f,
+						$identifier=cat(c$id$orig_h),
 						$conn=c]
 					);
 				}
@@ -94,4 +100,4 @@ event file_state_remove(f:fa_file)
 	}
 }
 
-#end bzar_files.bro
+#end bzar_files.zeek

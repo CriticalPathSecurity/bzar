@@ -1,7 +1,12 @@
 #
 # File: bzar_config_options.zeek
 # Created: 20191121
-# Updated: 20201009
+# Updated: 20201109
+
+# Updated by Patrick Kelley for enhanced Leargas Functionality
+# Primary enhancements made to the notice message output.
+# Patrick Kelley (patrick.kelley@criticalpathsecurity.com)
+
 #
 # Copyright 2018 The MITRE Corporation.  All Rights Reserved.
 # Approved for public release.  Distribution unlimited.  Case number 18-3868.
@@ -18,7 +23,7 @@ export
 	#
 	# Description:
 	#	These config options should be tuned for your specific environment.
-	#	Use the Zeek Configuration Framework to change the default values 
+	#	Use the Zeek Configuration Framework to change the default values
 	#	during runtime.
 	#
 	# xxx_detect_option:
@@ -95,8 +100,8 @@ export
 	# ATTACK::Lateral_Movement_Extracted_File
 	# Options to control whether or not to extract files associated with Lateral Movement
 	# and whether or not to write to Notice Log. If _extract is False, _report has no effect.
-	option attack_lm_file_extract_option = T;		
-	option attack_lm_extracted_file_report_option = T;	
+	option attack_lm_file_extract_option = T;
+	option attack_lm_extracted_file_report_option = T;
 
 	# ATTACK::Persistence
 	option t1547_004_detect_option = T;
@@ -132,7 +137,7 @@ export
 	# Aggregate SumStats Reporting of Discovery Indicators
 	# Dependent on individual Discovery indicators above.
 
-	option attack_discovery_report_option = T; 
+	option attack_discovery_report_option = T;
 
 
 	#
@@ -146,22 +151,22 @@ export
 	#
 	# xxxx_whitelist_orig_addrs : set[addr]
 	#	Add originating IP addresses to ignore for an ATT&CK indicator.
-	#	The value of 'c$id$orig_h' is checked against this list before 
+	#	The value of 'c$id$orig_h' is checked against this list before
 	#	writing to Notice Log and/or SumStats Observation.
 	#
 	# xxxx_whitelist_resp_addrs : set[addr]
 	#	Add responding IP addresses to ignore for an ATT&CK indicator.
-	#	The value of 'c$id$resp_h' is checked against this list before 
+	#	The value of 'c$id$resp_h' is checked against this list before
 	#	writing to Notice Log and/or SumStats Observation.
 	#
 	# xxxx_whitelist_orig_subnets : set[subnet]
 	#	Add originating IP subnets to ignore for an ATT&CK indicator.
-	#	The value of 'c$id$orig_h' is checked against this list before 
+	#	The value of 'c$id$orig_h' is checked against this list before
 	#	writing to Notice Log and/or SumStats Observation.
 	#
 	# xxxx_whitelist_resp_subnets : set[subnet]
 	#	Add responding IP subnets to ignore for an ATT&CK indicator.
-	#	The value of 'c$id$resp_h' is checked against this list before 
+	#	The value of 'c$id$resp_h' is checked against this list before
 	#	writing to Notice Log and/or SumStats Observation.
 	#
 	# xxxx_whitelist_orig_names : set[string]

@@ -1,7 +1,12 @@
 #
 # File: bzar_dce-rpc_consts.zeek
 # Created: 20180701
-# Updated: 20201009
+# Updated: 20201109
+
+# Updated by Patrick Kelley for enhanced Leargas Functionality
+# Primary enhancements made to the notice message output.
+# Patrick Kelley (patrick.kelley@criticalpathsecurity.com)
+
 #
 # Copyright 2018 The MITRE Corporation.  All Rights Reserved.
 # Approved for public release.  Distribution unlimited.  Case number 18-3868.
@@ -15,7 +20,7 @@ export
 	#
 	# Windows DCE-RPC functions (endpoint::operation) used for
 	# Credential Access on the remote system
-	# 
+	#
 	# Relevant ATT&CK Technique(s):
 	#    T1003.006 OS Credential Dumping: DCSync
 
@@ -31,7 +36,7 @@ export
 	#
 	# Windows DCE-RPC functions (endpoint::operation) used for
 	# Defense Evasion on the remote system
-	# 
+	#
 	# Relevant ATT&CK Technique(s):
 	#    T1070.001 Indicator Removal on Host: Clear Windows Event Logs
 
@@ -47,16 +52,16 @@ export
 
 	# ATT&CK - Execution Techniques
 	#
-	# Windows DCE-RPC functions (endpoint::operation) used for 
+	# Windows DCE-RPC functions (endpoint::operation) used for
 	# Execution on the remote system
-	# 
+	#
 	# Relevant ATT&CK Technique(s):
 	#    T1569.002 System Services: Service Execution
 	#    T1047 Windows Management Instrumentation
 	#    T1053.002 Scheduled Task/Job: At
 	#    T1053.005 Scheduled Task/Job: Scheduled Task
 
-	const t1569_002_rpc_strings : set[string] = 
+	const t1569_002_rpc_strings : set[string] =
 	{
 		# T1569.002 System Services: Service Execution
 		["svcctl::CreateServiceWOW64W"],
@@ -67,7 +72,7 @@ export
 		["svcctl::StartServiceA"],
 	} &redef;
 
-	const t1047_rpc_strings : set[string] = 
+	const t1047_rpc_strings : set[string] =
 	{
 		# T1047 Windows Management Instrumentation
 		["IWbemServices::ExecMethod"],
@@ -93,7 +98,7 @@ export
 	#
 	# Windows DCE-RPC functions (endpoint::operation) used for
 	# Impact on the remote system
-	# 
+	#
 	# Relevant ATT&CK Technique(s):
 	#    T1529 System Shutdown/Reboot
 
@@ -114,19 +119,19 @@ export
 	#
 	# Windows DCE-RPC functions (endpoint::operation) used for
 	# Persistence on the remote system
-	# 
+	#
 	# Relevant ATT&CK Technique(s):
 	#    T1547.004 Boot or Logon Autostart Execution: Winlogon Helper DLL
 	#    T1547.010 Boot or Logon Autostart Execution: Port Monitors
 
-	const t1547_004_rpc_strings : set[string] = 
+	const t1547_004_rpc_strings : set[string] =
 	{
 		# T1547.004 Boot or Logon Autostart Execution: Winlogon Helper DLL
 		["ISecLogon::SeclCreateProcessWithLogonW"],
 		["ISecLogon::SeclCreateProcessWithLogonExW"],
 	} &redef;
 
-	const t1547_010_rpc_strings : set[string] = 
+	const t1547_010_rpc_strings : set[string] =
 	{
 		# T1547.010 Boot or Logon Autostart Execution: Port Monitors
 		["spoolss::RpcAddMonitor"],		# aka winspool | spoolss
@@ -143,10 +148,10 @@ export
 	#
 	# Relevant ATT&CK Technique(s):
 	#    T1016 System Network Configuration Discovery
-	#    T1018 Remote System Discovery 
-	#    T1033 System Owner/User Discovery 
+	#    T1018 Remote System Discovery
+	#    T1033 System Owner/User Discovery
 	#    T1049 System Network Connections Discovery
-	#    T1069 Permission Groups Discovery 
+	#    T1069 Permission Groups Discovery
 	#    T1082 System Information Discovery
 	#    T1083 File & Directory Discovery
 	#    T1087 Account Discovery
@@ -162,7 +167,7 @@ export
 
 	const t1018_rpc_strings : set[string] =
 	{
-		# T1018 Remote System Discovery 
+		# T1018 Remote System Discovery
 		["srvsvc::NetrServerGetInfo"],
 		["srvsvc::NetrServerAliasEnum"],
 		["wkssvc::NetrWkstaGetInfo"],
@@ -170,7 +175,7 @@ export
 
 	const t1033_rpc_strings : set[string] =
 	{
-		# T1033 System Owner/User Discovery 
+		# T1033 System Owner/User Discovery
 		["lsarpc::LsarGetUserName"],
 		["lsarpc::LsarEnumerateTrustedDomainsEx"],
 		["lsarpc::LsarGetSystemAccessAccount"],
@@ -195,7 +200,7 @@ export
 
 	const t1069_rpc_strings : set[string] =
 	{
-		# T1069 Permission Groups Discovery 
+		# T1069 Permission Groups Discovery
 		["lsarpc::LsarEnumerateAccountRights"],
 		["lsarpc::LsarEnumerateAccountsWithUserRight"],
 		["lsarpc::LsarEnumeratePrivileges"],

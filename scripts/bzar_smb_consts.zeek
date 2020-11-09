@@ -1,7 +1,12 @@
 #
 # File: bzar_smb_consts.zeek
 # Created: 20180701
-# Updated: 20201009
+# Updated: 20201109
+
+# Updated by Patrick Kelley for enhanced Leargas Functionality
+# Primary enhancements made to the notice message output.
+# Patrick Kelley (patrick.kelley@criticalpathsecurity.com)
+
 #
 # Copyright 2018 The MITRE Corporation.  All Rights Reserved.
 # Approved for public release.  Distribution unlimited.  Case number 18-3868.
@@ -39,12 +44,12 @@ export
 @endif
 	redef SMB::logged_file_actions	+= { SMB::FILE_WRITE, } &redef;
 
-	redef record SMB::FileInfo	+= 
+	redef record SMB::FileInfo	+=
 	{
 		# Keep track of how many bytes written for
 		# SMB:FILE_WRITE request and response.
 		#
-		# This could be an interesting diagnostic for 
+		# This could be an interesting diagnostic for
 		# SMB::FILE_READ too, but not implemented yet.
 
 		data_offset_req	: count &optional &log; # File offset to first byte to write/read
